@@ -1,4 +1,4 @@
-3# flutter_chat
+# flutter_chat
 
-A new Flutter project.
+A chat application built in flutter with appwrite
 
