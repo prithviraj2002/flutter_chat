@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'new_database/new_chat_db.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 

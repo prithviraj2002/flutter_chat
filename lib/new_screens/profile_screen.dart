@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_chat/model/connect_profile.dart';
 import 'package:flutter_chat/new_database/new_db.dart';
 import 'package:flutter_chat/new_provider/new_provider.dart';
 import 'package:flutter_chat/new_screens/home_screen.dart';
+import 'package:flutter_chat/storage/appwrite_storage.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -15,6 +19,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   TextEditingController _userNameController = TextEditingController();
   TextEditingController _bioController = TextEditingController();
+  final ImagePicker picker = ImagePicker();
+  dynamic image = '';
 
   @override
   void dispose() {
@@ -35,8 +41,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: <Widget>[
               Center(
                 child: GestureDetector(
-                  onTap: () {
-
+                  onTap: () async{
+                    //ToDo: Add image picker and image upload logic
                   },
                   child: Stack(
                     children: [

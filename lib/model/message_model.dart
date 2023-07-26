@@ -1,27 +1,35 @@
 class Message{
-  final String msg;
+  final String message;
   final String userId;
-  final String recieverId;
+  final String receiverId;
+  final String time;
+  final String id;
 
   Message({
-    required this.msg,
+    required this.message,
     required this.userId,
-    required this.recieverId
+    required this.receiverId,
+    required this.time,
+    required this.id
   });
 
   factory Message.fromMap(Map<String, dynamic> json){
     return Message(
-        msg: json['message'],
+        message: json['message'],
         userId: json['userId'],
-        recieverId: json['recieverId']
+        receiverId: json['receiverId'],
+      time: json['time'],
+      id: json['id']
     );
   }
 
   Map<String, dynamic> toMap(){
     return {
-      'message': msg,
+      'message': message,
       'userId' : userId,
-      'recieverId': recieverId
+      'receiverId': receiverId,
+      'time': time,
+      'id': id
     };
   }
 }

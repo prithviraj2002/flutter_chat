@@ -5,8 +5,13 @@ import 'package:flutter_chat/model/connect_profile.dart';
 import 'package:flutter_chat/model/connect_user.dart';
 import 'package:flutter_chat/new_database/new_chat_db.dart';
 import 'package:flutter_chat/new_provider/new_provider.dart';
+import 'package:flutter_chat/provider/user_provider.dart';
+import 'package:flutter_chat_bubble/chat_bubble.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:appwrite/appwrite.dart' as appWrite;
+
+import '../model/message_model.dart';
 
 class MessageScreen extends StatefulWidget {
   final ConnectProfile connectProfile; final String collectionId;
@@ -25,14 +30,13 @@ class _MessageScreenState extends State<MessageScreen> {
     Provider.of<ConnectDb>(context, listen: false).getRealTimeMessages(widget.collectionId);
     Provider.of<ConnectDb>(context, listen: false).getOldMsgs(widget.collectionId);
     super.initState();
-    // TODO: implement initState
-    // Provider.of<ConnectDb>(context, listen: false).chats.clear();
   }
 
   @override
   void dispose() {
     // TODO: implement dispose
     msgController.dispose();
+    //Provider.of<ConnectDb>(context, listen: false).closeSubscription(widget.collectionId);
     super.dispose();
   }
 
@@ -46,7 +50,7 @@ class _MessageScreenState extends State<MessageScreen> {
         ),
         body: Container(
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-          child: connectDb.chats.isEmpty ? Expanded(child: Center(
+          child: connectDb.msgs.isEmpty ? Expanded(child: Center(
             child: ListView(
               children: [
                 Image.asset('assets/images/empty.png'),
@@ -58,23 +62,38 @@ class _MessageScreenState extends State<MessageScreen> {
           ))
               : ListView.separated(
               itemBuilder: (ctx, index) {
-                return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                  alignment: connectDb.chats[index].payload['userId'] == ConnectUserProvider.userId? Alignment.topRight : Alignment.topLeft,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: connectDb.chats[index].payload['userId'] == ConnectUserProvider.userId? Colors.black12 : Colors.deepPurple
-                  ),
-                  child: Text(
-                    connectDb.chats[index].payload['message'],
-                    style: TextStyle(
-                        color: connectDb.chats[index].payload['userId'] == ConnectUserProvider.userId? Colors.black : Colors.white
+                return ChatBubble(
+                  clipper: connectDb.msgs[index].userId == ConnectUserProvider.userId ? ChatBubbleClipper1(type: BubbleType.sendBubble) : ChatBubbleClipper1(type: BubbleType.receiverBubble),
+                  backGroundColor: connectDb.msgs[index].userId == ConnectUserProvider.userId ? Colors.grey : Colors.deepPurple,
+                  alignment: connectDb.msgs[index].userId == ConnectUserProvider.userId ? Alignment.topRight : Alignment.topLeft,
+                  child: Container(
+                    constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width * 0.7
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          connectDb.msgs[index].message,
+                          style: const TextStyle(
+                              color: Colors.white,
+                            fontSize: 18
+                          ),
+                        ),
+                        Text(
+                          connectDb.msgs[index].time,
+                          style: const TextStyle(
+                              color: Colors.white,
+                            fontSize: 14,
+                            fontStyle: FontStyle.italic
+                          ),)
+                      ],
                     ),
                   ),
                 );
               },
               separatorBuilder: (ctx, index) => const SizedBox(height: 10,),
-              itemCount: connectDb.chats.length
+              itemCount: connectDb.msgs.length
           )
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -101,9 +120,13 @@ class _MessageScreenState extends State<MessageScreen> {
                   onPressed: () async{
                     if(msgController.text.isNotEmpty){
                       await connectDb.sendMessage(
-                          msgController.text,
-                          ConnectUserProvider.userId,
-                          widget.connectProfile.userId,
+                          Message(
+                              message: msgController.text,
+                              userId: ConnectUserProvider.userId,
+                              receiverId: widget.connectProfile.userId,
+                              time: DateFormat('HH:mm').format(DateTime.now()),
+                              id: appWrite.ID.unique(),
+                          ),
                           widget.collectionId
                       ).then((value){
                         if(value.$id.isNotEmpty){
@@ -124,6 +147,8 @@ class _MessageScreenState extends State<MessageScreen> {
     );
   }
 }
+
+
 
 
 
