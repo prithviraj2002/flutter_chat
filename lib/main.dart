@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chat/new_screens/onboarding_screen.dart';
+import 'package:flutter_chat/new_screens/splash_screen.dart';
 import 'package:flutter_chat/provider/user_provider.dart';
 import 'package:flutter_chat/screens/auth_screen.dart';
 import 'package:flutter_chat/screens/home_screen.dart';
@@ -45,7 +46,7 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        home: const OnBoardingScreen(),
+        home: const SplashScreen(),
         routes: {
           PostScreen.routeName: (ctx) => const PostScreen(),
           AuthScreen.routeName: (ctx) => const AuthScreen(),

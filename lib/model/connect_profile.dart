@@ -6,11 +6,15 @@ class ConnectProfile{
   ConnectProfile({
     required this.userName,
     required this.bio,
-    required this.userId
+    required this.userId,
   });
 
   factory ConnectProfile.fromMap(Map<String, dynamic> json){
-    return ConnectProfile(userName: json['userName'], bio: json['bio'], userId: json['userId']);
+    return ConnectProfile(
+        userName: json['userName'],
+        bio: json['bio'],
+        userId: json['userId'],
+    );
   }
 
   Map<String, dynamic> toMap(){

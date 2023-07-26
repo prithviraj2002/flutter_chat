@@ -7,7 +7,10 @@ import 'package:flutter_chat/new_provider/new_provider.dart';
 import 'package:flutter_chat/new_screens/auth_screen.dart';
 import 'package:flutter_chat/new_screens/messages_screen.dart';
 import 'package:flutter_chat/screens/auth_screen.dart';
+import 'package:flutter_chat/storage/appwrite_storage.dart';
 import 'package:provider/provider.dart';
+import 'dart:io' as io;
+import 'package:appwrite/models.dart' as apm;
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -59,6 +62,7 @@ class HomeScreen extends StatelessWidget {
               }
               else{
                 return ListView.separated(
+                  shrinkWrap: true,
                     itemBuilder: (ctx, index){
                       ConnectProfile connectProfile = ConnectProfile.fromMap(profiles[index].data);
                       return ListTile(
@@ -71,6 +75,26 @@ class HomeScreen extends StatelessWidget {
                                   },
                           );
                         },
+                        leading: SizedBox(
+                          width: 50,
+                          child: FutureBuilder(
+                              future: dpStorage.getImage(connectProfile.userId),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot snapshot) {
+                                if (snapshot.hasData) {
+                                  final apm.File image = snapshot.data;
+                                  return Image.file(
+                                      io.File(image.name),
+                                    height: 100,
+                                    fit: BoxFit.cover,
+                                  );
+                                } else if (snapshot.hasError) {
+                                  return const Icon(Icons.error_outline);
+                                } else {
+                                  return const Center(child: CircularProgressIndicator());
+                                }
+                              }),
+                        ),
                         title: Row(
                           children: [
                             Text(connectProfile.userName),

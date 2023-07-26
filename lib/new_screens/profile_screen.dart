@@ -19,8 +19,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   TextEditingController _userNameController = TextEditingController();
   TextEditingController _bioController = TextEditingController();
-  final ImagePicker picker = ImagePicker();
-  dynamic image = '';
+  String imagePath = '';
 
   @override
   void dispose() {
@@ -42,9 +41,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Center(
                 child: GestureDetector(
                   onTap: () async{
-                    //ToDo: Add image picker and image upload logic
+                    await dpStorage.chooseImage('gallery').then((value){
+                      setState(() {
+                        imagePath = value;
+                      });
+                    });
                   },
-                  child: Stack(
+                  child: imagePath.isEmpty ? Stack(
                     children: [
                       Image.asset(
                         'assets/images/profilepic.png',
@@ -60,7 +63,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           )
                       )
                     ]
-                  ),
+                  ) : Image.file(
+                      File(imagePath),
+                    height: 200,
+                    width: 200,
+                    fit: BoxFit.cover,
+                  )
+                  ,
                 ),
               ),
               const Text('Profile', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),),
@@ -111,7 +120,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     profileDb.createProfile(connectProfile).then(
                         (value){
                           if(value.$id.isNotEmpty){
-                            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (ctx) => const HomeScreen()), (route) => false);
+                            if(imagePath.isNotEmpty){
+                              dpStorage.uploadImage(imagePath).then((value){
+                                Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (ctx) => const HomeScreen()), (route) => false);
+                              });
+                            }
                           }
                           else{
                             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('An error occurred!')));

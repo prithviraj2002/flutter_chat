@@ -10,6 +10,9 @@ import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:appwrite/appwrite.dart' as appWrite;
+import 'dart:io' as io;
+import 'package:appwrite/models.dart' as apm;
+import 'package:flutter_chat/storage/appwrite_storage.dart';
 
 import '../model/message_model.dart';
 
@@ -46,7 +49,35 @@ class _MessageScreenState extends State<MessageScreen> {
       builder: (buildContext, connectDb, child) => Scaffold(
         appBar: AppBar(
           elevation: 1,
-          title: Text(widget.connectProfile.userName),
+          title: Row(
+            children: [
+              SizedBox(
+                width: 50,
+                child: FutureBuilder(
+                    future: dpStorage.getImage(widget.connectProfile.userId),
+                    builder: (BuildContext context,
+                        AsyncSnapshot snapshot) {
+                      if (snapshot.hasData) {
+                        final apm.File image = snapshot.data;
+                        return CircleAvatar(
+                          child: Image.file(
+                            io.File(image.name),
+                            height: 100,
+                            width: 100,
+                            fit: BoxFit.cover,
+                          ),
+                        );
+                      } else if (snapshot.hasError) {
+                        return const Icon(Icons.error_outline);
+                      } else {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                    }),
+              ),
+              const SizedBox(width: 10,),
+              Text(widget.connectProfile.userName),
+            ],
+          ),
         ),
         body: Container(
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
