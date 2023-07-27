@@ -26,23 +26,22 @@ class ConnectDb with ChangeNotifier{
     final appWrite.Client client = appWrite.Client().setEndpoint(NewConstants.realtimeEndpoint).setProject(NewConstants.projectId);
     final appWrite.Realtime realtime = appWrite.Realtime(client);
     realtime.subscribe(["databases.$DbId.collections.$collectionId.documents"]).stream.listen((event) {
-      print('listening');
+
       if(event.events.contains("databases.$DbId.collections.$collectionId.documents.*.create")){
-        print('doc created!');
+
         if(!msgs.contains(Message.fromMap(event.payload))){
           getOldMsgs(collectionId);
         }
         notifyListeners();
       }
       if(event.events.contains("databases.$DbId.collections.$collectionId.documents.*.delete")){
-        print('doc deleted!');
+
         if(msgs.contains(Message.fromMap(event.payload))){
           getOldMsgs(collectionId);
         }
         notifyListeners();
       }
       else{
-        print('Print Nothing');
       }
     });
   }

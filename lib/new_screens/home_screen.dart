@@ -12,8 +12,22 @@ import 'package:provider/provider.dart';
 import 'dart:io' as io;
 import 'package:appwrite/models.dart' as apm;
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+
+  var isLoading = false;
+
+  void toggleLoading(){
+    setState(() {
+      isLoading = !isLoading;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +46,10 @@ class HomeScreen extends StatelessWidget {
                       actions: [
                         TextButton(
                             onPressed: () {
+                              //toggleLoading();
+                              print(ConnectUserProvider.sessionId);
                               profileDb.signout(ConnectUserProvider.sessionId).then((value){
+                                //toggleLoading();
                                 Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (ctx) => const AuthroizationScreen()), (route) => false);
                               });
                             },
@@ -70,7 +87,7 @@ class HomeScreen extends StatelessWidget {
                           await Provider.of<ConnectDb>(context, listen: false).getCollection(ConnectUserProvider.userId, connectProfile.userId).then(
                                   (value){
                                     if(value.isNotEmpty){
-                                      Navigator.of(context).push(MaterialPageRoute(builder: (ctx) => MessageScreen(connectProfile: connectProfile, collectionId: value,)));
+                                      Navigator.push(context, MaterialPageRoute(builder: (ctx) => MessageScreen(connectProfile: connectProfile, collectionId: value,)));
                                     }
                                   },
                           );

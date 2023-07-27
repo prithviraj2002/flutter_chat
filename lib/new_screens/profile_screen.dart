@@ -9,7 +9,8 @@ import 'package:flutter_chat/storage/appwrite_storage.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final String userId;
+  const ProfileScreen({required this.userId, super.key});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -20,6 +21,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   TextEditingController _userNameController = TextEditingController();
   TextEditingController _bioController = TextEditingController();
   String imagePath = '';
+  var isLoading = false;
+
+  void toggleLoading(){
+    setState(() {
+      isLoading = !isLoading;
+    });
+  }
 
   @override
   void dispose() {
@@ -111,17 +119,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 20,),
               TextButton(
                   onPressed: () {
+                    toggleLoading();
                     if(_userNameController.text.isNotEmpty && _bioController.text.isNotEmpty){
                       ConnectProfile connectProfile = ConnectProfile(
                           userName: _userNameController.text,
                           bio: _bioController.text,
-                          userId: ConnectUserProvider.userId
+                          userId: widget.userId
                       );
                     profileDb.createProfile(connectProfile).then(
                         (value){
                           if(value.$id.isNotEmpty){
                             if(imagePath.isNotEmpty){
                               dpStorage.uploadImage(imagePath).then((value){
+                                toggleLoading();
                                 Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (ctx) => const HomeScreen()), (route) => false);
                               });
                             }
@@ -133,7 +143,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       );
                     }
                   },
-                  child: const Row(
+                  child: isLoading ? const CircularProgressIndicator()
+                  : const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text('Continue', style: TextStyle(fontSize: 25),),

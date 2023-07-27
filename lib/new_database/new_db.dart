@@ -26,7 +26,12 @@ class profileDb{
   static Future<apm.User> signUp(ConnectUser connectUser){
     try{
       final response = ap.Account(ap.Client().setEndpoint(NewConstants.endPoint).setProject(NewConstants.projectId))
-          .create(userId: connectUser.userId, email: connectUser.email, password: connectUser.password, name: connectUser.email);
+          .create(
+          userId: connectUser.userId,
+          email: connectUser.email,
+          password: connectUser.password,
+          name: connectUser.email,
+      );
       return response;
     } on AppwriteException catch(_){
       rethrow;
@@ -69,7 +74,6 @@ class profileDb{
       rethrow;
     }
   }
-
   static Future<DocumentList> getProfileList(){
     try{
       final response = databases.listDocuments(

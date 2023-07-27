@@ -25,6 +25,13 @@ class _AuthroizationScreenState extends State<AuthroizationScreen> {
 
   bool isNewUser = true;
   String image = '';
+  var isLoading = false;
+
+  void toggleLoading(){
+    setState(() {
+      isLoading = !isLoading;
+    });
+  }
 
   @override
   void dispose() {
@@ -111,23 +118,31 @@ class _AuthroizationScreenState extends State<AuthroizationScreen> {
               const SizedBox(height: 20,),
               TextButton(
                 onPressed: () async{
+                  toggleLoading();
+                  final userId = DateTime.now().millisecond.toString();
                   if(isNewUser && _email.text.isNotEmpty && _password.text.isNotEmpty && _confirmPasswordController.text == _password.text){
-                    ConnectUser connectUser = ConnectUser(email: _email.text, password: _password.text, userId: DateTime.now().millisecond.toString());
+                    ConnectUser connectUser = ConnectUser(email: _email.text, password: _password.text, userId: userId);
                     await profileDb.signUp(connectUser).then((value){
-                      ConnectUserProvider.setUserId(DateTime.now().millisecond.toString());
+                      ConnectUserProvider.setUserId(userId);
                       ConnectUserProvider.setSessionId(value.$id);
-                      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (ctx) => const ProfileScreen()), (route) => false);
+                      print(ConnectUserProvider.sessionId);
+                      print(ConnectUserProvider.userId);
+                      toggleLoading();
+                      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (ctx) => ProfileScreen(userId: userId,)), (route) => false);
                     });
                   }
-                  if(isNewUser == false && _email.text.isNotEmpty && _password.text.isNotEmpty){
+                  if(!isNewUser && _email.text.isNotEmpty && _password.text.isNotEmpty){
                     await profileDb.signIn(_email.text, _password.text).then((value){
                       ConnectUserProvider.setSessionId(value.$id);
                       ConnectUserProvider.setUserId(value.userId);
+                      print(ConnectUserProvider.sessionId);
+                      print(ConnectUserProvider.userId);
+                      toggleLoading();
                       Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (ctx) => const HomeScreen()), (route) => false);
                     });
                   }
                 },
-                child: isNewUser? const Text('Sign up', style: TextStyle(fontSize: 20),) : const Text('Login', style: TextStyle(fontSize: 20),),
+                child: isLoading? const CircularProgressIndicator() : isNewUser? const Text('Sign up', style: TextStyle(fontSize: 20),) : const Text('Login', style: TextStyle(fontSize: 20),),
               ),
               const SizedBox(height: 10,),
               TextButton(

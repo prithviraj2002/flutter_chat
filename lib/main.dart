@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (ctx) => UserProvider()),
+        //ChangeNotifierProvider(create: (ctx) => UserProvider()),
         ChangeNotifierProvider(create: (ctx) => ConnectDb())
       ],
       child: MaterialApp(
@@ -47,10 +47,6 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
         ),
         home: const SplashScreen(),
-        routes: {
-          PostScreen.routeName: (ctx) => const PostScreen(),
-          AuthScreen.routeName: (ctx) => const AuthScreen(),
-        },
       ),
     );
   }

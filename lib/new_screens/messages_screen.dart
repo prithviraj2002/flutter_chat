@@ -27,6 +27,13 @@ class MessageScreen extends StatefulWidget {
 class _MessageScreenState extends State<MessageScreen> {
 
   TextEditingController msgController = TextEditingController();
+  var isLoading = false;
+
+  void toggleLoading(){
+    setState(() {
+      isLoading = !isLoading;
+    });
+  }
 
   @override
   void initState() {
@@ -39,7 +46,6 @@ class _MessageScreenState extends State<MessageScreen> {
   void dispose() {
     // TODO: implement dispose
     msgController.dispose();
-    //Provider.of<ConnectDb>(context, listen: false).closeSubscription(widget.collectionId);
     super.dispose();
   }
 
@@ -81,98 +87,107 @@ class _MessageScreenState extends State<MessageScreen> {
         ),
         body: Container(
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-          child: connectDb.msgs.isEmpty ? Expanded(child: Center(
-            child: ListView(
-              children: [
-                Image.asset('assets/images/empty.png'),
-                const Align(
-                  alignment: Alignment.center,
-                    child: Text('Start Texting!', style: TextStyle(fontSize: 20),))
-              ],
-            )
-          ))
-              : ListView.separated(
-              itemBuilder: (ctx, index) {
-                return ChatBubble(
-                  clipper: connectDb.msgs[index].userId == ConnectUserProvider.userId ? ChatBubbleClipper1(type: BubbleType.sendBubble) : ChatBubbleClipper1(type: BubbleType.receiverBubble),
-                  backGroundColor: connectDb.msgs[index].userId == ConnectUserProvider.userId ? Colors.grey : Colors.deepPurple,
-                  alignment: connectDb.msgs[index].userId == ConnectUserProvider.userId ? Alignment.topRight : Alignment.topLeft,
-                  child: Container(
-                    constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * 0.7
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          connectDb.msgs[index].message,
-                          style: const TextStyle(
-                              color: Colors.white,
-                            fontSize: 18
+          child: Column(
+                children: [
+                  Expanded(
+                    child: connectDb.msgs.isEmpty ? Center(
+                        child: ListView(
+                          children: [
+                            Image.asset('assets/images/empty.png'),
+                            const Align(
+                                alignment: Alignment.center,
+                                child: Text('Start Texting!', style: TextStyle(fontSize: 20),))
+                          ],
+                        )
+                    )
+                    : ListView.separated(
+                      shrinkWrap: true,
+                    itemBuilder: (ctx, index) {
+                      return ChatBubble(
+                        clipper: connectDb.msgs[index].userId == ConnectUserProvider.userId ? ChatBubbleClipper1(type: BubbleType.sendBubble) : ChatBubbleClipper1(type: BubbleType.receiverBubble),
+                        backGroundColor: connectDb.msgs[index].userId == ConnectUserProvider.userId ? Colors.grey : Colors.deepPurple,
+                        alignment: connectDb.msgs[index].userId == ConnectUserProvider.userId ? Alignment.topRight : Alignment.topLeft,
+                        child: Container(
+                          constraints: BoxConstraints(
+                            maxWidth: MediaQuery.of(context).size.width * 0.7
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                connectDb.msgs[index].message,
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                  fontSize: 18
+                                ),
+                              ),
+                              Text(
+                                connectDb.msgs[index].time,
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                  fontSize: 14,
+                                  fontStyle: FontStyle.italic
+                                ),)
+                            ],
                           ),
                         ),
-                        Text(
-                          connectDb.msgs[index].time,
-                          style: const TextStyle(
-                              color: Colors.white,
-                            fontSize: 14,
-                            fontStyle: FontStyle.italic
-                          ),)
+                      );
+                    },
+                    separatorBuilder: (ctx, index) => const SizedBox(height: 10,),
+                    itemCount: connectDb.msgs.length
+          ),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                        border: Border.all(),
+                        borderRadius: BorderRadius.circular(10)
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                    margin: const EdgeInsets.only(left: 10, right: 10),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: TextFormField(
+                            maxLines: null,
+                            autocorrect: true,
+                            enableSuggestions: true,
+                            controller: msgController,
+                            decoration: const InputDecoration(
+                                border: InputBorder.none
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                            onPressed: () async{
+                              toggleLoading();
+                              if(msgController.text.isNotEmpty){
+                                await connectDb.sendMessage(
+                                    Message(
+                                      message: msgController.text,
+                                      userId: ConnectUserProvider.userId,
+                                      receiverId: widget.connectProfile.userId,
+                                      time: DateFormat('HH:mm').format(DateTime.now()),
+                                      id: appWrite.ID.unique(),
+                                    ),
+                                    widget.collectionId
+                                ).then((value){
+                                  toggleLoading();
+                                  if(value.$id.isNotEmpty){
+                                    msgController.clear();
+                                  }
+                                  else{
+                                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('An error occurred')));
+                                  }
+                                });
+                              }
+                            },
+                            icon: isLoading ? const CircularProgressIndicator() : const Icon(Icons.send)
+                        )
                       ],
                     ),
                   ),
-                );
-              },
-              separatorBuilder: (ctx, index) => const SizedBox(height: 10,),
-              itemCount: connectDb.msgs.length
-          )
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        floatingActionButton: Container(
-          decoration: BoxDecoration(
-            border: Border.all(),
-            borderRadius: BorderRadius.circular(10)
-          ),
-          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-          margin: const EdgeInsets.only(left: 10, right: 10),
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                child: TextFormField(
-                  autocorrect: true,
-                  enableSuggestions: true,
-                  controller: msgController,
-                  decoration: const InputDecoration(
-                    border: InputBorder.none
-                  ),
-                ),
-              ),
-              IconButton(
-                  onPressed: () async{
-                    if(msgController.text.isNotEmpty){
-                      await connectDb.sendMessage(
-                          Message(
-                              message: msgController.text,
-                              userId: ConnectUserProvider.userId,
-                              receiverId: widget.connectProfile.userId,
-                              time: DateFormat('HH:mm').format(DateTime.now()),
-                              id: appWrite.ID.unique(),
-                          ),
-                          widget.collectionId
-                      ).then((value){
-                        if(value.$id.isNotEmpty){
-                          msgController.clear();
-                        }
-                        else{
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('An error occurred')));
-                        }
-                      });
-                    }
-                  },
-                  icon: const Icon(Icons.send)
+                ],
               )
-            ],
-          ),
         ),
       ),
     );

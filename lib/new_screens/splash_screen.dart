@@ -25,7 +25,7 @@ class SplashScreen extends StatelessWidget {
               ],
               onComplete: (controller){
                 if(controller.isCompleted){
-                  Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (ctx) => const OnBoardingScreen()), (route) => false);
+                  Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (ctx) => const OnBoardingScreen()), (route) => false);
                 }
               },
               child: const Text('Social Bee', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28),),
