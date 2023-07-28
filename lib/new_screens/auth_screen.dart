@@ -2,7 +2,6 @@ import 'package:dart_appwrite/dart_appwrite.dart';
 
 import 'package:appwrite/models.dart' as apm;
 import 'package:flutter/material.dart';
-import 'package:flutter_chat/database/db.dart';
 import 'package:flutter_chat/model/connect_user.dart';
 import 'package:flutter_chat/new_database/new_db.dart';
 import 'package:flutter_chat/new_provider/new_provider.dart';

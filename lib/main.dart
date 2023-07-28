@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chat/new_screens/onboarding_screen.dart';
 import 'package:flutter_chat/new_screens/splash_screen.dart';
-import 'package:flutter_chat/provider/user_provider.dart';
-import 'package:flutter_chat/screens/auth_screen.dart';
-import 'package:flutter_chat/screens/home_screen.dart';
-import 'package:flutter_chat/screens/feed_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'new_database/new_chat_db.dart';

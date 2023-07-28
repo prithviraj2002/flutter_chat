@@ -3,20 +3,43 @@ import 'package:dart_appwrite/models.dart';
 
 import 'package:appwrite/appwrite.dart' as ap;
 import 'package:appwrite/models.dart' as apm;
+import 'package:flutter/material.dart';
 import 'package:flutter_chat/constants/new_constants.dart';
 import 'package:flutter_chat/model/connect_profile.dart';
 import 'package:flutter_chat/model/connect_user.dart';
 
 class profileDb{
-  static Client client = Client().setEndpoint(NewConstants.endPoint).setProject(NewConstants.projectId);
+  static Client client = Client().setEndpoint(NewConstants.endPoint).setProject(NewConstants.projectId).setKey(NewConstants.serversideApiKey);
 
   static Account account = Account(client);
 
   static Databases databases = Databases(client);
 
-  static Future<dynamic> signout(String sessionId){
+  static Users users = Users(client);
+
+  // static Future<dynamic> signout(String sessionId){
+  //   try{
+  //     final response = ap.Account(ap.Client().setEndpoint(NewConstants.endPoint).setProject(NewConstants.projectId)).deleteSession(sessionId: sessionId);
+  //     return response;
+  //   } on AppwriteException catch(e){
+  //     rethrow;
+  //   }
+  // }
+
+  static Future<dynamic> signout(String userId, String sessionId) async{
     try{
-      final response = ap.Account(ap.Client().setEndpoint(NewConstants.endPoint).setProject(NewConstants.projectId)).deleteSession(sessionId: sessionId);
+      final response = users.deleteSession(userId: userId, sessionId: sessionId);
+      return response;
+    } on AppwriteException catch(_){
+      rethrow;
+    }
+  }
+
+  static Future<apm.User> getAccount() async{
+    try{
+      ap.Client client = ap.Client().setProject(NewConstants.projectId).setEndpoint(NewConstants.endPoint);
+      ap.Account account = ap.Account(client);
+      final response = account.get();
       return response;
     } on AppwriteException catch(_){
       rethrow;
@@ -43,7 +66,7 @@ class profileDb{
       final response = ap.Account(ap.Client().setEndpoint(NewConstants.endPoint).setProject(NewConstants.projectId)).createEmailSession(
           email: email, password: password);
       return response;
-    } on AppwriteException catch(_){
+    } on AppwriteException catch(e){
       rethrow;
     }
   }
@@ -57,7 +80,7 @@ class profileDb{
           data: connectProfile.toMap()
       );
       return response;
-    } on AppwriteException catch(_){
+    } on AppwriteException catch(e){
       rethrow;
     }
   }

@@ -5,7 +5,6 @@ import 'package:flutter_chat/model/connect_profile.dart';
 import 'package:flutter_chat/model/connect_user.dart';
 import 'package:flutter_chat/new_database/new_chat_db.dart';
 import 'package:flutter_chat/new_provider/new_provider.dart';
-import 'package:flutter_chat/provider/user_provider.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chat/new_screens/auth_screen.dart';
 import 'package:flutter_chat/new_screens/profile_screen.dart';
-import 'package:flutter_chat/screens/auth_screen.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

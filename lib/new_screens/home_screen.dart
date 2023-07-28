@@ -6,7 +6,6 @@ import 'package:flutter_chat/new_database/new_db.dart';
 import 'package:flutter_chat/new_provider/new_provider.dart';
 import 'package:flutter_chat/new_screens/auth_screen.dart';
 import 'package:flutter_chat/new_screens/messages_screen.dart';
-import 'package:flutter_chat/screens/auth_screen.dart';
 import 'package:flutter_chat/storage/appwrite_storage.dart';
 import 'package:provider/provider.dart';
 import 'dart:io' as io;
@@ -45,10 +44,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       backgroundColor: Colors.white,
                       actions: [
                         TextButton(
-                            onPressed: () {
+                            onPressed: () async {
                               //toggleLoading();
                               print(ConnectUserProvider.sessionId);
-                              profileDb.signout(ConnectUserProvider.sessionId).then((value){
+                              String userId = '';
+                              await profileDb.getAccount().then((value){
+                                setState(() {
+                                  userId = value.$id;
+                                });
+                              });
+                              profileDb.signout(userId ,ConnectUserProvider.sessionId).then((value){
                                 //toggleLoading();
                                 Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (ctx) => const AuthroizationScreen()), (route) => false);
                               });
